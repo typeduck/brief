@@ -1,0 +1,71 @@
+= Brief
+
+A simple, zero-dependency library to generate (and verify) tokens of arbitrary
+data with an expiration date. You can think of this as a _very_ stripped-down
+version of JWT.
+
+It's based on the https://pdos.csail.mit.edu/papers/webauth:sec10.pdf[Dos and
+Don'ts of Client Authentication on the Web], which is an oldie but goodie.
+
+It is called `brief` because:
+
+1. Life is brief
+2. The tokens this module generates are best briefly-lived
+3. Brief means "letter" (paper & envelope!) in German, and you should sign
+   those, too.
+
+== Installation
+
+To use brief in your project, run:
+
+----
+go get github.com/typeduck/brief
+----
+
+== Usage
+
+Below is a basic example of how to use the module to create a new `Mint` for
+generating tokens and how to verify a token's validity.
+
+[source,go]
+----
+package main
+
+import (
+    "fmt"
+    "time"
+	
+    "github.com/typeduck/brief" // Import the module
+)
+
+func main() {
+    // Create a new Mint with a secret.
+    mint := brief.NewMint([]byte("your-256-bit-secret"))
+
+    // Generate a token with a 1-hour expiration.
+    token, err := mint.Sign([]byte("session-id-or-whatever"), time.Now().Add(time.Hour))
+    if err != nil {
+	   // handle error
+    }
+    // You can also generate random data, say for a session ID.
+    token, err := mint.Generate(18, time.Now().Add(time.Hour))
+    if err != nil {
+        // handle error
+    }
+
+    // Print the generated token... perhaps you want to send a cookie?
+	tokenAsString := token.String()
+    fmt.Println("Generated Token:", tokenAsString)
+
+	// If you want to get the string-encoded form of random data...
+	dataString := brief.Encode(token.Data)
+
+    // Verify the token, e.g. parsing a cookie sent back from client.
+    token2, err := mint.VerifyString(tokenAsString)
+    if err != nil {
+        fmt.Println("Token verification failed:", err)
+    } else {
+        fmt.Println("Token is valid. Payload:", brief.Encode(token2.Data))
+    }
+}
+----
