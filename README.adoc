@@ -32,40 +32,40 @@ generating tokens and how to verify a token's validity.
 package main
 
 import (
-    "fmt"
-    "time"
-	
-    "github.com/typeduck/brief" // Import the module
+	"fmt"
+	"time"
+
+	"github.com/typeduck/brief" // Import the module
 )
 
 func main() {
-    // Create a new Mint with a secret.
-    mint := brief.NewMint([]byte("your-256-bit-secret"))
+	// Create a new Mint with a secret.
+	mint := brief.NewMint([]byte("your-256-bit-secret"))
 
-    // Generate a token with a 1-hour expiration.
-    token, err := mint.Sign([]byte("session-id-or-whatever"), time.Now().Add(time.Hour))
-    if err != nil {
-	   // handle error
-    }
-    // You can also generate random data, say for a session ID.
-    token, err := mint.Generate(18, time.Now().Add(time.Hour))
-    if err != nil {
-        // handle error
-    }
+	// Generate a token with a 1-hour expiration.
+	token, err := mint.Sign([]byte("session-id-or-whatever"), time.Now().Add(time.Hour))
+	if err != nil {
+		// handle error
+	}
+	// You can also generate random data, say for a session ID.
+	token, err := mint.Generate(18, time.Now().Add(time.Hour))
+	if err != nil {
+		// handle error
+	}
 
-    // Print the generated token... perhaps you want to send a cookie?
+	// Print the generated token... perhaps you want to send a cookie?
 	tokenAsString := token.String()
-    fmt.Println("Generated Token:", tokenAsString)
+	fmt.Println("Generated Token:", tokenAsString)
 
 	// If you want to get the string-encoded form of random data...
 	dataString := brief.Encode(token.Data)
 
-    // Verify the token, e.g. parsing a cookie sent back from client.
-    token2, err := mint.VerifyString(tokenAsString)
-    if err != nil {
-        fmt.Println("Token verification failed:", err)
-    } else {
-        fmt.Println("Token is valid. Payload:", brief.Encode(token2.Data))
-    }
+	// Verify the token, e.g. parsing a cookie sent back from client.
+	token2, err := mint.VerifyString(tokenAsString)
+	if err != nil {
+		fmt.Println("Token verification failed:", err)
+	} else {
+		fmt.Println("Token is valid. Payload:", brief.Encode(token2.Data))
+	}
 }
 ----
